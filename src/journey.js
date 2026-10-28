@@ -19,7 +19,7 @@ export const milestones = Array.from({ length: 13 }, (_, index) => Date.parse(`$
 
 function point(t, vertical = false) {
   return vertical
-    ? { x: 195 + Math.sin(t * Math.PI * 4) * 50, y: 80 + 1720 * t }
+    ? { x: 195 - Math.cos(t * Math.PI * 13) * 60, y: 88 + 1584 * t }
     : { x: 66 + 1308 * t, y: 260 + Math.sin(t * Math.PI * 4) * 108 };
 }
 
@@ -41,7 +41,7 @@ export function setupJourney() {
   }).join('');
   function layout() {
     width = vertical.matches ? 390 : 1440;
-    height = vertical.matches ? 1880 : 520;
+    height = vertical.matches ? 1760 : 520;
     document.querySelector('.road').setAttribute('viewBox', `0 0 ${width} ${height}`);
     const samples = Array.from({ length: 261 }, (_, i) => point(i / 260, vertical.matches));
     const path = samples.map((p, i) => `${i ? 'L' : 'M'}${p.x},${p.y}`).join(' ');
