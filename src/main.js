@@ -1,6 +1,6 @@
 import { animate, stagger } from 'animejs';
 import './style.css';
-import { remaining, plural, unitForms } from './timer.js';
+import { remaining, plural, unitForms, TARGET_TIME } from './timer.js';
 import { setupJourney } from './journey.js';
 import { setupTimerDepth } from './depth.js';
 import { renderNumber, settleRolls } from './drum.js';
@@ -11,12 +11,46 @@ const heading = document.querySelector('h1');
 const countdown = document.querySelector('.countdown');
 const today = document.querySelector('.today');
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
+const previewFinish = new URLSearchParams(location.search).get('preview') === 'finish';
+const finishSeenKey = `arrival-timer:final-seen:${TARGET_TIME}`;
+let seenInMemory = false;
+let pendingFinal;
+let sceneVisible = false;
+function hasSeenFinal() {
+  try { return seenInMemory || localStorage.getItem(finishSeenKey) === '1'; }
+  catch { return seenInMemory; }
+}
+function rememberFinal() {
+  seenInMemory = true;
+  try { localStorage.setItem(finishSeenKey, '1'); } catch { /* Storage may be disabled. */ }
+}
+function launchPendingFinal() {
+  if (document.hidden || !sceneVisible || !pendingFinal) return;
+  const launch = pendingFinal;
+  pendingFinal = undefined;
+  launch();
+}
+const sceneObserver = new IntersectionObserver(([entry]) => {
+  sceneVisible = entry.isIntersecting && entry.intersectionRatio >= .5;
+  launchPendingFinal();
+}, { root: document.querySelector('.pages'), threshold: [0, .5] });
+sceneObserver.observe(document.querySelector('.scene'));
 let ended = false;
 let tickId;
 const atmosphereAnimations = [];
 const compact = matchMedia('(max-width: 600px)');
 let pointerAnimation;
 let previous = {};
+const transientAnimations = new Set();
+function transition(target, parameters) {
+  const onComplete = parameters.onComplete;
+  const animation = animate(target, { ...parameters, onComplete: (...args) => {
+    transientAnimations.delete(animation);
+    onComplete?.(...args);
+  } });
+  transientAnimations.add(animation);
+  return animation;
+}
 
 function setupAtmosphere() {
   for (const animation of atmosphereAnimations) animation.cancel();
@@ -27,10 +61,12 @@ function setupAtmosphere() {
   }
   if (motion.matches) return;
   const layers = [
-    ['.halo-one', 18000, '3vw', '2vh', [.8, .98, .8]],
-    ['.halo-two', 24000, '-3vw', '-3vh', [.7, .9, .7]],
-    ...(!compact.matches ? [['.halo-three', 28000, '2vw', '-2vh', [.5, .72, .5]]] : []),
-    ['.light-ribbon', 30000, '1.5vw', '-1.5vh', compact.matches ? [.38, .48, .38] : [.55, .7, .55]],
+    ['.halo-one', 24000, compact.matches ? '.7vw' : '1.5vw', compact.matches ? '.6vh' : '1vh', [.8, .85, .8]],
+    ...(!compact.matches ? [
+      ['.halo-two', 26000, '-1.5vw', '-1vh', [.7, .75, .7]],
+      ['.halo-three', 28000, '1vw', '-1vh', [.5, .54, .5]],
+    ] : []),
+    ['.light-ribbon', 30000, compact.matches ? '.5vw' : '1vw', compact.matches ? '-.5vh' : '-1vh', compact.matches ? [.38, .4, .38] : [.55, .59, .55]],
   ];
   for (const [selector, duration, x, y, opacity] of layers) {
     const animation = animate(selector, {
@@ -42,7 +78,7 @@ function setupAtmosphere() {
   }
 }
 
-function finish(initial) {
+function finish() {
   if (ended) return;
   ended = true;
   clearTimeout(tickId);
@@ -53,24 +89,33 @@ function finish(initial) {
     today.hidden = false;
     heading.textContent = 'Время до встречи';
     document.body.classList.add('finished');
-    if (!initial && !motion.matches) animate(today, { opacity: [0, 1], rotateX: [-30, 0], z: [80, 40], y: [12, 0], duration: 1200, ease: 'outCubic' });
+    if (animateFinal && !motion.matches) transition(today, { opacity: [0, 1], rotateX: [-30, 0], z: [80, 40], y: [12, 0], duration: 1200, ease: 'outCubic' });
   };
   const colors = { '--surface': '#E9F6E9', '--accent': '#203C25', '--glow': 'rgba(101,186,116,.28)', '--edge-shade': 'rgba(32,60,37,.06)' };
   document.querySelector('meta[name="theme-color"]').content = '#E9F6E9';
-  if (initial) {
+  let animateFinal = false;
+  const showStaticFinal = () => {
     for (const [key, value] of Object.entries(colors)) root.style.setProperty(key, value);
     reveal();
-  } else {
+  };
+  if (!previewFinish && hasSeenFinal()) { showStaticFinal(); return; }
+  pendingFinal = () => {
+    // Recheck when foregrounded: another tab may already have shown the final.
+    if (!previewFinish && hasSeenFinal()) { showStaticFinal(); return; }
+    if (!previewFinish) rememberFinal();
+    if (motion.matches) { showStaticFinal(); return; }
+    animateFinal = true;
     playFlypast();
-    animate(root, { ...colors, duration: motion.matches ? 180 : 2800, ease: 'inOutSine' });
-    animate(countdown, { opacity: 0, duration: motion.matches ? 100 : 450, onComplete: reveal });
-    if (!motion.matches) animate('.wave', { scale: [.05, 1.2], opacity: [{ to: .85, duration: 900 }, { to: 0, duration: 2100 }], duration: 3000, ease: 'outSine' });
-  }
+    transition(root, { ...colors, duration: motion.matches ? 180 : 2800, ease: 'inOutSine' });
+    transition(countdown, { opacity: 0, duration: motion.matches ? 100 : 450, onComplete: reveal });
+    if (!motion.matches) transition('.wave', { scale: [.05, 1.2], opacity: [{ to: .85, duration: 900 }, { to: 0, duration: 2100 }], duration: 3000, ease: 'outSine' });
+  };
+  launchPendingFinal();
 }
 
 function tick(initial = false) {
   const state = remaining();
-  if (state.finished) { finish(initial); return; }
+  if (state.finished) { if (!previewFinish) finish(); return; }
   for (const [key, forms] of Object.entries(unitForms)) {
     const group = document.querySelector(`[data-unit="${key}"]`);
     if (previous[key] !== state[key]) {
@@ -85,18 +130,19 @@ function tick(initial = false) {
   tickId = setTimeout(() => tick(), Math.min(1000 - Date.now() % 1000 + 5, 1000));
 }
 
-tick(true);
+if (!previewFinish || !remaining().finished) tick(true);
 setupJourney();
 setupTimerDepth();
 // Explicit, repeatable preview; does not change the deadline or save state.
-if (new URLSearchParams(location.search).get('preview') === 'finish' && !ended) {
-  setTimeout(() => finish(false), 4000);
+let previewId;
+if (previewFinish && !ended) {
+  previewId = setTimeout(finish, 4000);
 }
 document.body.classList.add('ready');
 if (!motion.matches) {
-  animate('.composition', { opacity: [0, 1], y: [10, 0], duration: 900, ease: 'outCubic' });
+  transition('.composition', { opacity: [0, 1], y: [10, 0], duration: 900, ease: 'outCubic' });
   if (!ended) {
-    animate('.unit', { opacity: [0, 1], y: [8, 0], delay: stagger(65, { start: 100 }), duration: 750, ease: 'outCubic' });
+    transition('.unit', { opacity: [0, 1], y: [8, 0], delay: stagger(65, { start: 100 }), duration: 750, ease: 'outCubic' });
   }
 }
 setupAtmosphere();
@@ -108,6 +154,7 @@ document.addEventListener('visibilitychange', () => {
     for (const animation of atmosphereAnimations) animation.pause();
   } else {
     if (!ended) tick();
+    launchPendingFinal();
     if (!motion.matches) for (const animation of atmosphereAnimations) animation.play();
   }
 });
@@ -123,5 +170,17 @@ motion.addEventListener('change', () => {
     pointerAnimation?.cancel();
     document.querySelector('.photograph').style.transform = 'scale(1.04)';
     settleRolls();
+    for (const animation of [...transientAnimations]) animation.complete();
   }
 });
+window.addEventListener('pagehide', event => {
+  if (event.persisted) return;
+  clearTimeout(previewId);
+  sceneObserver.disconnect();
+  clearTimeout(tickId);
+  pointerAnimation?.cancel();
+  for (const animation of atmosphereAnimations) animation.cancel();
+  for (const animation of transientAnimations) animation.cancel();
+  transientAnimations.clear();
+});
+

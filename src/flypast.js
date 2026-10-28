@@ -18,16 +18,31 @@ export function playFlypast() {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   };
   resize();
-  const start = performance.now();
+  let start = performance.now();
+  let hiddenAt = document.hidden ? start : null;
   const colors = ['245,248,255', '48,112,225', '218,57,77'];
   const cleanup = () => {
     cancelAnimationFrame(frame); canvas.remove();
     window.removeEventListener('resize', resize);
     motion.removeEventListener('change', onMotion);
+    document.removeEventListener('visibilitychange', onVisibility);
+    window.removeEventListener('pagehide', cleanup);
   };
   const onMotion = () => { if (motion.matches) cleanup(); };
+  const onVisibility = () => {
+    if (document.hidden) {
+      hiddenAt = performance.now();
+      cancelAnimationFrame(frame);
+    } else if (hiddenAt !== null) {
+      start += performance.now() - hiddenAt;
+      hiddenAt = null;
+      frame = requestAnimationFrame(draw);
+    }
+  };
   window.addEventListener('resize', resize);
   motion.addEventListener('change', onMotion);
+  document.addEventListener('visibilitychange', onVisibility);
+  window.addEventListener('pagehide', cleanup);
   function draw(now) {
     const t = (now - start) / 1000;
     if (t >= 4.8) { cleanup(); return; }
@@ -106,5 +121,5 @@ export function playFlypast() {
     });
     frame = requestAnimationFrame(draw);
   }
-  frame = requestAnimationFrame(draw);
+  if (!document.hidden) frame = requestAnimationFrame(draw);
 }
