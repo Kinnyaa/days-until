@@ -93,6 +93,11 @@ h1 { font-family: 'Manrope Variable', sans-serif; font-size: clamp(20px, 2vw, 28
 .countdown, .unit { transform-style: preserve-3d; }
 .unit { perspective: 700px; }
 .number { transform: translateZ(28px); transform-origin: 50% 65%; backface-visibility: hidden; text-shadow: 0 1px 0 color-mix(in srgb, var(--accent) 60%, var(--surface)), 0 2px 0 color-mix(in srgb, var(--accent) 48%, var(--surface)), 0 3px 0 color-mix(in srgb, var(--accent) 35%, var(--surface)), 0 4px 0 color-mix(in srgb, var(--accent) 25%, var(--surface)), 0 5px 0 color-mix(in srgb, var(--accent) 15%, var(--surface)), 0 12px 16px rgba(0,0,0,.25); }
+.number { display: inline-flex; justify-content: center; min-width: 1.2em; height: 1.2em; padding-right: 0; letter-spacing: -.045em; }
+.digit-window { display: block; flex: 0 0 .6em; width: .6em; height: 1.2em; overflow: hidden; mask-image: linear-gradient(transparent 0%, #000 12%, #000 86%, transparent 100%); }
+.digit-strip { display: flex; flex-direction: column; width: 100%; }
+.digit-face { display: block; flex: 0 0 1.2em; height: 1.2em; line-height: 1.2em; text-align: center; }
+.digit-face::before { content: attr(data-digit); }
 .label { transform: translateZ(14px); }
 .today { transform: translateZ(40px); text-shadow: 0 2px 0 color-mix(in srgb, var(--accent) 40%, var(--surface)), 0 4px 0 color-mix(in srgb, var(--accent) 20%, var(--surface)), 0 18px 30px rgba(0,0,0,.2); }
 .finished .time-surface::before { display: none; }

@@ -3,13 +3,13 @@ import './style.css';
 import { remaining, plural, unitForms } from './timer.js';
 import { setupJourney } from './journey.js';
 import { setupTimerDepth } from './depth.js';
+import { renderNumber, settleRolls } from './drum.js';
 
 const root = document.documentElement;
 const heading = document.querySelector('h1');
 const countdown = document.querySelector('.countdown');
 const today = document.querySelector('.today');
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
-const active = new Map();
 let ended = false;
 let tickId;
 const atmosphereAnimations = [];
@@ -41,20 +41,11 @@ function setupAtmosphere() {
   }
 }
 
-function changeNumber(element, text) {
-  active.get(element)?.cancel();
-  element.textContent = text;
-  if (motion.matches) { element.style.opacity = '1'; element.style.transform = ''; return; }
-  active.set(element, animate(element, {
-    opacity: [.35, 1], rotateX: [-65, 0], y: [9, 0], z: [48, 28],
-    duration: 520, ease: 'outCubic',
-  }));
-}
-
 function finish(initial) {
   if (ended) return;
   ended = true;
   clearTimeout(tickId);
+  settleRolls();
   document.querySelector('#announcement').textContent = 'Время до встречи — сегодня';
   const reveal = () => {
     countdown.hidden = true;
@@ -83,8 +74,7 @@ function tick(initial = false) {
     if (previous[key] !== state[key]) {
       const number = group.querySelector('.number');
       const text = String(state[key]).padStart(2, '0');
-      if (initial) number.textContent = text;
-      else changeNumber(number, text);
+      renderNumber(number, text, !initial && !motion.matches && !document.hidden);
       group.querySelector('.label').textContent = plural(state[key], forms);
     }
   }
@@ -112,6 +102,7 @@ compact.addEventListener('change', setupAtmosphere);
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
     clearTimeout(tickId);
+    settleRolls();
     for (const animation of atmosphereAnimations) animation.pause();
   } else {
     if (!ended) tick();
@@ -129,6 +120,6 @@ motion.addEventListener('change', () => {
   if (motion.matches) {
     pointerAnimation?.cancel();
     document.querySelector('.photograph').style.transform = 'scale(1.04)';
-    for (const [element, animation] of active) { animation.cancel(); element.style.opacity = '1'; element.style.transform = ''; }
+    settleRolls();
   }
 });
