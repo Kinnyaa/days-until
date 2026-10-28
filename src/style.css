@@ -15,7 +15,7 @@
 body { margin: 0; background: var(--surface); color: var(--accent); }
 [hidden] { display: none !important; }
 .atmosphere { position: fixed; inset: 0; overflow: hidden; pointer-events: none; background: var(--surface); }
-.photograph { width: 100%; height: 100%; object-fit: cover; object-position: 50% 42%; opacity: .065; filter: saturate(.45); transform: scale(1.04); }
+.photograph { width: 100%; height: 100%; object-fit: cover; object-position: 50% 42%; opacity: .03; filter: saturate(.45); transform: scale(1.04); }
 .wash { position: absolute; inset: 0; background: linear-gradient(180deg, transparent, var(--surface)); opacity: .5; }
 .halo { position: absolute; width: 65vw; height: 65vw; border-radius: 50%; background: radial-gradient(ellipse, var(--glow), transparent 65%); }
 .halo-one { top: -38vw; left: -4vw; }
