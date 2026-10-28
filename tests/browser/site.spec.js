@@ -73,3 +73,22 @@ test('journey is a separate screen with dated stops and a right-to-left mobile p
   await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
   await expect(page.locator('.stop').first().locator('.days-relative')).toHaveText('352 дня назад');
 });
+
+test('timer tilts in 3D with the pointer and stops under reduced motion', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 960 });
+  const now = Date.parse('2026-10-28T12:00:00+03:00');
+  await page.clock.install({ time: now - 60000 });
+  await page.clock.pauseAt(now);
+  await page.goto('/');
+  await page.clock.runFor(1500);
+  const surface = page.locator('.time-surface');
+  const initial = await surface.evaluate(el => getComputedStyle(el).transform);
+  const bounds = await surface.boundingBox();
+  await page.mouse.move(bounds.x + bounds.width * .85, bounds.y + bounds.height * .3);
+  await page.clock.runFor(1000);
+  expect(await surface.evaluate(el => getComputedStyle(el).transform)).not.toBe(initial);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect(surface).toHaveCSS('transform', 'none');
+  await expect(page.locator('.number').first()).toHaveCSS('transform', 'none');
+  await expect(page.locator('.depth-stage')).toHaveCSS('transform', 'none');
+});

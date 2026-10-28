@@ -2,6 +2,7 @@ import { animate, stagger } from 'animejs';
 import './style.css';
 import { remaining, plural, unitForms } from './timer.js';
 import { setupJourney } from './journey.js';
+import { setupTimerDepth } from './depth.js';
 
 const root = document.documentElement;
 const heading = document.querySelector('h1');
@@ -44,7 +45,10 @@ function changeNumber(element, text) {
   active.get(element)?.cancel();
   element.textContent = text;
   if (motion.matches) { element.style.opacity = '1'; element.style.transform = ''; return; }
-  active.set(element, animate(element, { opacity: [.4, 1], y: [5, 0], duration: 230, ease: 'outCubic' }));
+  active.set(element, animate(element, {
+    opacity: [.35, 1], rotateX: [-65, 0], y: [9, 0], z: [48, 28],
+    duration: 520, ease: 'outCubic',
+  }));
 }
 
 function finish(initial) {
@@ -57,7 +61,7 @@ function finish(initial) {
     today.hidden = false;
     heading.textContent = 'Время до встречи';
     document.body.classList.add('finished');
-    if (!initial && !motion.matches) animate(today, { opacity: [0, 1], y: [12, 0], duration: 1000, ease: 'outCubic' });
+    if (!initial && !motion.matches) animate(today, { opacity: [0, 1], rotateX: [-30, 0], z: [80, 40], y: [12, 0], duration: 1200, ease: 'outCubic' });
   };
   const colors = { '--surface': '#5B2A5E', '--accent': '#B2F2D8', '--glow': 'rgba(178,242,216,.28)' };
   document.querySelector('meta[name="theme-color"]').content = '#5B2A5E';
@@ -91,6 +95,7 @@ function tick(initial = false) {
 
 tick(true);
 setupJourney();
+setupTimerDepth();
 // Explicit, repeatable preview; does not change the deadline or save state.
 if (new URLSearchParams(location.search).get('preview') === 'finish' && !ended) {
   setTimeout(() => finish(false), 4000);
