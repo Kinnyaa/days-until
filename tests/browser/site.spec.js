@@ -48,7 +48,7 @@ test('resuming a suspended tab catches up from the actual clock', async ({ page 
   await expect(page.locator('[data-unit="minutes"] .number')).toHaveText('01');
 });
 
-test('journey is a separate screen with dated stops and a right-to-left mobile path', async ({ page }) => {
+test('journey is a separate screen with a top-to-bottom mobile path and left-to-right desktop path', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   const now = Date.parse('2026-10-28T12:00:00+03:00');
@@ -65,13 +65,20 @@ test('journey is a separate screen with dated stops and a right-to-left mobile p
   await expect(page.locator('.stop').first().locator('.days-relative')).toHaveText('351 день назад');
   await expect(page.locator('.stop').last().locator('time')).toHaveText('14 ноября');
   await expect(page.locator('.stop').last().locator('.days-relative')).toHaveText('через 17 дней');
-  expect(await page.locator('.board-viewport').evaluate(el => el.scrollLeft > 0)).toBe(true);
-  await page.locator('.board-viewport').evaluate(el => { el.scrollLeft = 0; });
+  expect(await page.locator('.board-viewport').evaluate(el => el.scrollLeft === 0 && el.scrollTop === 0 && el.scrollHeight > el.clientHeight)).toBe(true);
+  const firstTop = await page.locator('.stop').first().evaluate(el => el.offsetTop);
+  const lastTop = await page.locator('.stop').last().evaluate(el => el.offsetTop);
+  expect(lastTop).toBeGreaterThan(firstTop);
+  await page.locator('.board-viewport').evaluate(el => { el.scrollTop = el.scrollHeight; });
   await expect(page.locator('.finish-stop')).toBeInViewport();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.clock.setSystemTime(Date.parse('2026-10-29T00:01:00+03:00'));
   await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
   await expect(page.locator('.stop').first().locator('.days-relative')).toHaveText('352 дня назад');
+  await page.setViewportSize({ width: 1440, height: 960 });
+  const firstLeft = await page.locator('.stop').first().evaluate(el => el.offsetLeft);
+  const lastLeft = await page.locator('.stop').last().evaluate(el => el.offsetLeft);
+  expect(lastLeft).toBeGreaterThan(firstLeft);
 });
 
 test('timer tilts in 3D with the pointer and stops under reduced motion', async ({ page }) => {

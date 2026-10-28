@@ -48,6 +48,14 @@ html, body { height: 100%; overflow: hidden; }
 .journey-hint { display: none; text-align: center; font-size: 11px; opacity: .65; margin: 20px 0 0; }
 @media (max-width: 1219px) { .journey-hint { display: block; } }
 @media (max-height: 550px) { .journey h2 { margin-bottom: 0; font-size: 22px; } .board { height: 300px; } .journey-hint { margin-top: 0; } }
+@media (max-width: 600px) {
+  .board-viewport { height: clamp(280px, 68svh, 650px); overflow-x: hidden; overflow-y: auto; overscroll-behavior-x: auto; overscroll-behavior-y: auto; }
+  .board { width: 100%; height: 1880px; }
+  .stop-caption, .label-above .stop-caption, .label-below .stop-caption { width: 90px; top: -20px; bottom: auto; left: 30px; text-align: left; }
+  .caption-left .stop-caption { left: -120px; text-align: right; }
+  .journey h2 { margin-bottom: 18px; }
+  .journey-hint { margin-top: 14px; }
+}
 [hidden] { display: none !important; }
 .atmosphere { position: fixed; inset: 0; overflow: hidden; pointer-events: none; background: var(--surface); }
 .photograph { width: 100%; height: 100%; object-fit: cover; object-position: 62% 34%; opacity: .03; filter: saturate(.45); transform: scale(1.04); }

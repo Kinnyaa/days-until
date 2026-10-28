@@ -17,26 +17,51 @@ export function dayLabel(time, now = Date.now()) {
 }
 export const milestones = Array.from({ length: 13 }, (_, index) => Date.parse(`${2025 + Math.floor((10 + index) / 12)}-${String((10 + index) % 12 + 1).padStart(2, '0')}-11T00:00:00+03:00`)).concat(TARGET_TIME);
 
-function point(t) { return { x: 1374 - 1308 * t, y: 260 + Math.sin(t * Math.PI * 4) * 108 }; }
+function point(t, vertical = false) {
+  return vertical
+    ? { x: 195 + Math.sin(t * Math.PI * 4) * 50, y: 80 + 1720 * t }
+    : { x: 66 + 1308 * t, y: 260 + Math.sin(t * Math.PI * 4) * 108 };
+}
 
 export function setupJourney() {
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  const vertical = matchMedia('(max-width: 600px)');
   const board = document.querySelector('.board');
   const viewport = document.querySelector('.board-viewport');
   const stops = document.querySelector('.stops');
   const panels = [...document.querySelectorAll('.panel')];
-  const samples = Array.from({ length: 261 }, (_, i) => point(i / 260));
-  const path = samples.map((p, i) => `${i ? 'L' : 'M'}${p.x},${p.y}`).join(' ');
-  for (const road of document.querySelectorAll('.road path')) road.setAttribute('d', path);
   const progress = document.querySelector('.road-progress');
-  const length = progress.getTotalLength();
-  const distances = [0];
-  for (let i = 1; i < samples.length; i++) distances.push(distances[i - 1] + Math.hypot(samples[i].x - samples[i - 1].x, samples[i].y - samples[i - 1].y));
+  let length;
+  let distances;
+  let width;
+  let height;
   stops.innerHTML = milestones.map((time, i) => {
-    const position = point(i / (milestones.length - 1));
     const date = dateLabel.format(new Date(time));
-    return `<li class="stop ${i % 2 ? 'label-below' : 'label-above'} ${i === 13 ? 'finish-stop' : ''}" style="left:${position.x / 14.4}%;top:${position.y / 5.2}%"><span class="island" aria-hidden="true"><span class="island-dot"></span></span><div class="stop-caption"><time datetime="${new Date(time).toISOString()}">${date}</time><span class="days-relative"></span>${i === 13 ? '<span class="finish-label">Встреча</span>' : ''}</div></li>`;
+    return `<li class="stop ${i % 2 ? 'label-below' : 'label-above'} ${i === 13 ? 'finish-stop' : ''}"><span class="island" aria-hidden="true"><span class="island-dot"></span></span><div class="stop-caption"><time datetime="${new Date(time).toISOString()}">${date}</time><span class="days-relative"></span>${i === 13 ? '<span class="finish-label">Встреча</span>' : ''}</div></li>`;
   }).join('');
+  function layout() {
+    width = vertical.matches ? 390 : 1440;
+    height = vertical.matches ? 1880 : 520;
+    document.querySelector('.road').setAttribute('viewBox', `0 0 ${width} ${height}`);
+    const samples = Array.from({ length: 261 }, (_, i) => point(i / 260, vertical.matches));
+    const path = samples.map((p, i) => `${i ? 'L' : 'M'}${p.x},${p.y}`).join(' ');
+    for (const road of document.querySelectorAll('.road path')) road.setAttribute('d', path);
+    length = progress.getTotalLength();
+    distances = [0];
+    for (let i = 1; i < samples.length; i++) distances.push(distances[i - 1] + Math.hypot(samples[i].x - samples[i - 1].x, samples[i].y - samples[i - 1].y));
+    [...stops.children].forEach((stop, i) => {
+      const position = point(i / (milestones.length - 1), vertical.matches);
+      stop.style.left = `${position.x / width * 100}%`;
+      stop.style.top = `${position.y / height * 100}%`;
+      stop.classList.toggle('caption-left', position.x >= width / 2);
+    });
+    viewport.setAttribute('aria-label', vertical.matches ? 'Дорожка дат. Начало сверху; прокручивайте вниз к встрече.' : 'Дорожка дат. Начало слева; прокручивайте вправо к встрече.');
+    document.querySelector('.journey-hint').textContent = vertical.matches ? 'Листай дорожку вниз' : 'Листай дорожку вправо';
+    viewport.scrollLeft = 0;
+    viewport.scrollTop = 0;
+    lastDay = undefined;
+    update();
+  }
   let lastDay;
   function update() {
     const now = Date.now();
@@ -56,16 +81,17 @@ export function setupJourney() {
       segment = Math.max(0, segment);
       t = (segment + (now - milestones[segment]) / (milestones[segment + 1] - milestones[segment])) / (milestones.length - 1);
     }
-    const position = point(t);
+    const position = point(t, vertical.matches);
     const marker = board.querySelector('.traveler');
-    marker.style.left = `${position.x / 14.4}%`;
-    marker.style.top = `${position.y / 5.2}%`;
+    marker.style.left = `${position.x / width * 100}%`;
+    marker.style.top = `${position.y / height * 100}%`;
     const index = Math.min(259, Math.floor(t * 260));
     const traveled = distances[index] + (distances[index + 1] - distances[index]) * (t * 260 - index);
     progress.style.strokeDasharray = `${length} ${length}`;
     progress.style.strokeDashoffset = `${length - traveled}`;
   }
-  update();
+  layout();
+  vertical.addEventListener('change', layout);
   const refresh = setInterval(update, 30000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) update(); });
   window.addEventListener('pageshow', update);
@@ -76,13 +102,13 @@ export function setupJourney() {
       for (const panel of panels) panel.classList.toggle('is-active', panel === entry.target);
       if (entry.target.id === 'journey' && !seen) {
         seen = true;
-        viewport.scrollLeft = viewport.scrollWidth - viewport.clientWidth;
+        viewport.scrollLeft = 0; viewport.scrollTop = 0;
         if (!motion.matches) animate('.stop', { opacity: [0, 1], y: [6, 0], duration: 650, delay: stagger(45), ease: 'outCubic' });
       }
     }
   }, { root: document.querySelector('.pages'), threshold: [.55, .75] });
   panels.forEach(panel => observer.observe(panel));
-  // Start at the right-hand beginning, including on narrow screens.
-  viewport.scrollLeft = viewport.scrollWidth - viewport.clientWidth;
+  // Start at the beginning: left on desktop, top on mobile.
+  viewport.scrollLeft = 0; viewport.scrollTop = 0;
   window.addEventListener('pagehide', event => { if (!event.persisted) clearInterval(refresh); });
 }
