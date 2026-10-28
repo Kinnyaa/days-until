@@ -1,5 +1,6 @@
 import { animate, stagger } from 'animejs';
 import { plural, TARGET_TIME } from './timer.js';
+import { setupJourneyStory } from './journey-story.js';
 
 const DAY = 86400000;
 const calendar = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Moscow', year: 'numeric', month: '2-digit', day: '2-digit' });
@@ -17,10 +18,17 @@ export function dayLabel(time, now = Date.now()) {
 }
 export const milestones = Array.from({ length: 13 }, (_, index) => Date.parse(`${2025 + Math.floor((10 + index) / 12)}-${String((10 + index) % 12 + 1).padStart(2, '0')}-11T00:00:00+03:00`)).concat(TARGET_TIME);
 
-function point(t, vertical = false) {
+export function point(t, vertical = false) {
   return vertical
     ? { x: 195 - Math.cos(t * Math.PI * 13) * 60, y: 88 + 1584 * t }
     : { x: 66 + 1308 * t, y: 260 + Math.sin(t * Math.PI * 4) * 108 };
+}
+
+export function journeyPosition(now = Date.now()) {
+  if (now < milestones[0]) return 0;
+  if (now >= milestones.at(-1)) return 1;
+  const segment = Math.max(0, milestones.findIndex(time => time > now) - 1);
+  return (segment + (now - milestones[segment]) / (milestones[segment + 1] - milestones[segment])) / 13;
 }
 
 export function setupJourney() {
@@ -66,7 +74,6 @@ export function setupJourney() {
   function update() {
     const now = Date.now();
     const day = moscowDay(now);
-    if (day === lastDay) return;
     lastDay = day;
     [...stops.children].forEach((stop, i) => {
       const difference = moscowDay(milestones[i]) - day;
@@ -74,13 +81,7 @@ export function setupJourney() {
       stop.classList.toggle('on-date', difference === 0);
       stop.querySelector('.days-relative').textContent = dayLabel(milestones[i], now);
     });
-    let segment = milestones.findIndex(time => time > now) - 1;
-    let t = 0;
-    if (now >= milestones.at(-1)) t = 1;
-    else if (now >= milestones[0]) {
-      segment = Math.max(0, segment);
-      t = (segment + (now - milestones[segment]) / (milestones[segment + 1] - milestones[segment])) / (milestones.length - 1);
-    }
+    const t = journeyPosition(now);
     const position = point(t, vertical.matches);
     const marker = board.querySelector('.traveler');
     marker.style.left = `${position.x / width * 100}%`;
@@ -91,6 +92,7 @@ export function setupJourney() {
     progress.style.strokeDashoffset = `${length - traveled}`;
   }
   layout();
+  setupJourneyStory({ board, point, journeyPosition, milestones });
   vertical.addEventListener('change', layout);
   const refresh = setInterval(update, 30000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) update(); });

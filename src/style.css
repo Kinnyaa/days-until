@@ -134,3 +134,63 @@ noscript { max-width: 30em; text-align: center; line-height: 1.6; }
   .light-ribbon { opacity: .38; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }
+.flypast { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; }
+.journey-story { position: absolute; inset: 0; pointer-events: none; color: var(--accent); }
+.story-actor, .story-event { position: absolute; width: 78px; height: 54px; filter: drop-shadow(0 4px 4px color-mix(in srgb, var(--accent) 12%, transparent)); }
+.story-actor { margin: -27px 0 0 -39px; transform: rotate(var(--bearing, 0deg)); z-index: 1; }
+.story-actor svg { animation: story-enter .25s ease-out; }
+.story-actor[data-kind="train"] svg, .story-actor[data-kind="car"] svg { clip-path: inset(0 0 0 var(--departure-cover, 0%)); }
+.story-departure { position: absolute; width: 44px; height: 40px; margin: -30px 0 0 -22px; z-index: 2; }
+.journey-story .story-departure .vehicle { fill: var(--surface); }
+.story-event { width: 80px; height: 53px; margin: -88px 0 0 -40px; opacity: 0; transform: translateY(7px) scale(.94); transition: opacity .5s, transform .5s; }
+.story-event[data-stop="3"] { width: 54px; margin-left: -27px; }
+.story-event[data-stop="8"] { width: 98px; margin-left: -49px; }
+.story-event.event-below { margin-top: 28px; }
+.story-event.revealed { opacity: 1; transform: translateY(0) scale(1); }
+.journey-story svg { width: 100%; height: 100%; overflow: visible; fill: none; stroke: var(--accent); stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; }
+.journey-story .vehicle, .journey-story .coat { fill: color-mix(in srgb, var(--accent) 24%, var(--surface)); }
+.journey-story .face { fill: color-mix(in srgb, var(--accent) 72%, var(--surface)); }
+.journey-story .person-woman .coat { fill: color-mix(in srgb, var(--accent) 65%, var(--surface)); }
+.journey-story .family-person .trousers, .journey-story .family-person .handbag { fill: var(--surface); }
+.journey-story .family-person .sleeve { stroke: color-mix(in srgb, var(--accent) 65%, var(--surface)); stroke-width: 4; }
+.journey-story .person-girlfriend .coat, .journey-story .soft-hair { fill: color-mix(in srgb, var(--accent) 75%, var(--surface)); }
+.journey-story .person-father .coat { fill: color-mix(in srgb, var(--accent) 16%, var(--surface)); }
+.journey-story .person-mother .coat { fill: color-mix(in srgb, var(--accent) 48%, var(--surface)); }
+.journey-story .family-person .scarf, .journey-story .family-person .hood { fill: var(--accent); stroke-width: .6; }
+.journey-story .family-person .skirt { fill: color-mix(in srgb, var(--accent) 32%, var(--surface)); }
+.journey-story .person-friendGirl .coat { fill: color-mix(in srgb, var(--accent) 52%, var(--surface)); }
+.journey-story .hat, .journey-story .hair, .journey-story .glass, .journey-story .wheel { fill: var(--surface); }
+.journey-story .seam { stroke-width: .7; opacity: .7; }
+.journey-story .leg, .journey-story .arm { stroke-width: 3; }
+.story-actor .step { animation: story-march .56s ease-in-out infinite alternate paused; }
+.story-actor .leg-b, .story-actor .arm { animation-direction: alternate-reverse; }
+.story-actor .wheel { animation: story-wheel .8s linear infinite paused; }
+.story-actor.moving .step, .story-actor.moving .wheel { animation-play-state: running; }
+.story-actor[data-kind="train"] { width: 116px; height: 40px; margin: -20px 0 0 -58px; }
+.story-actor[data-kind="soldiers"] { width: 92px; height: 58px; margin: -29px 0 0 -46px; }
+.journey-story .train-body { fill: color-mix(in srgb, var(--accent) 60%, var(--surface)); }
+.journey-story .train-stripe { fill: color-mix(in srgb, #b65060 55%, var(--accent)); stroke: none; }
+.journey-story .train-roof, .journey-story .helmet, .journey-story .vest { fill: color-mix(in srgb, var(--accent) 20%, var(--surface)); }
+.journey-story .uniform { fill: color-mix(in srgb, var(--accent) 34%, var(--surface)); }
+.journey-story .boot { fill: var(--surface); stroke-width: .9; }
+.journey-story .buckle { fill: var(--accent); stroke: none; }
+.journey-story .pantograph { stroke-width: 1.3; }
+.march-leg { transform-origin: 0px 45px; }
+.march-arm { transform-origin: 0px 28px; }
+.moving .march-front, .moving .march-back { animation: parade-leg 1.08s linear infinite; }
+.moving .march-back { animation-delay: -.54s; }
+.moving .march-front-arm, .moving .march-back-arm { animation: parade-arm 1.08s ease-in-out infinite; }
+.moving .march-front-arm { animation-delay: -.54s; }
+@keyframes parade-leg { 0%, 100% { transform: rotate(0deg); } 22% { transform: rotate(-34deg); } 48% { transform: rotate(0deg); } 74% { transform: rotate(18deg); } }
+@keyframes parade-arm { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-30deg); } 75% { transform: rotate(25deg); } }
+.story-started .traveler { opacity: 0; }
+@keyframes story-march { from { transform: rotate(-19deg); } to { transform: rotate(19deg); } }
+@keyframes story-wheel { to { transform: rotate(360deg); } }
+@keyframes story-enter { from { opacity: 0; } to { opacity: 1; } }
+@media (max-width: 600px) {
+  .story-actor { width: 64px; height: 46px; margin: -23px 0 0 -32px; }
+  .story-event, .story-event.event-below { margin-top: 27px; height: 48px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .journey-story *, .journey-story svg { animation: none !important; transition: none !important; }
+}

@@ -4,6 +4,7 @@ import { remaining, plural, unitForms } from './timer.js';
 import { setupJourney } from './journey.js';
 import { setupTimerDepth } from './depth.js';
 import { renderNumber, settleRolls } from './drum.js';
+import { playFlypast } from './flypast.js';
 
 const root = document.documentElement;
 const heading = document.querySelector('h1');
@@ -60,6 +61,7 @@ function finish(initial) {
     for (const [key, value] of Object.entries(colors)) root.style.setProperty(key, value);
     reveal();
   } else {
+    playFlypast();
     animate(root, { ...colors, duration: motion.matches ? 180 : 2800, ease: 'inOutSine' });
     animate(countdown, { opacity: 0, duration: motion.matches ? 100 : 450, onComplete: reveal });
     if (!motion.matches) animate('.wave', { scale: [.05, 1.2], opacity: [{ to: .85, duration: 900 }, { to: 0, duration: 2100 }], duration: 3000, ease: 'outSine' });
