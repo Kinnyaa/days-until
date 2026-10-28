@@ -8,7 +8,7 @@ test('mobile layout, correct remaining time and image', async ({ page }) => {
   await page.clock.install({ time: deadline - 90061000 });
   await page.clock.pauseAt(deadline - 90061000);
   await page.goto('/');
-  await expect(page.locator('h1')).toHaveText('Дней до приезда');
+  await expect(page.locator('h1')).toHaveText('Время до встречи');
   await expect(page.locator('[data-unit="days"] .number')).toHaveText('01');
   await expect(page.locator('[data-unit="hours"] .number')).toHaveText('01');
   await expect(page.locator('[data-unit="minutes"] .number')).toHaveText('01');

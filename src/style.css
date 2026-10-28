@@ -34,7 +34,7 @@ body { margin: 0; background: var(--surface); color: var(--accent); }
 .scene { min-height: 100svh; display: grid; place-items: center; padding: max(32px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(32px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left)); position: relative; }
 .composition { width: min(1100px, 100%); text-align: center; padding-bottom: 3vh; visibility: hidden; }
 .ready .composition { visibility: visible; }
-h1 { font-size: clamp(15px, 1.4vw, 19px); font-weight: 500; letter-spacing: .02em; margin: 0 0 clamp(38px, 6vw, 74px); line-height: 1.5; }
+h1 { font-family: 'Manrope Variable', sans-serif; font-size: clamp(20px, 2vw, 28px); font-weight: 300; letter-spacing: .01em; margin: 0 0 clamp(38px, 6vw, 74px); line-height: 1.5; }
 .time-surface { position: relative; padding: clamp(24px, 4vw, 42px) clamp(8px, 2vw, 30px); border-radius: 32px; background: linear-gradient(125deg, rgba(255,255,255,.026), rgba(255,255,255,.004)); border: 1px solid rgba(255,255,255,.045); box-shadow: 0 24px 90px rgba(0,0,0,.035); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
 .countdown { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(8px, 2.6vw, 32px); }
 .unit { min-width: 0; display: flex; flex-direction: column; align-items: center; gap: clamp(14px, 2vw, 24px); }
