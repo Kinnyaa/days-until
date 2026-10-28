@@ -91,6 +91,10 @@ function tick(initial = false) {
 
 tick(true);
 setupJourney();
+// Explicit, repeatable preview; does not change the deadline or save state.
+if (new URLSearchParams(location.search).get('preview') === 'finish' && !ended) {
+  setTimeout(() => finish(false), 4000);
+}
 document.body.classList.add('ready');
 if (!motion.matches) {
   animate('.composition', { opacity: [0, 1], y: [10, 0], duration: 900, ease: 'outCubic' });
