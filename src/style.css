@@ -6,7 +6,7 @@
   background: #2f3640;
   --surface: #2f3640;
   --accent: #b9a0f0;
-  --glow: rgba(185, 160, 240, .12);
+  --glow: rgba(185, 160, 240, .28);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -17,9 +17,18 @@ body { margin: 0; background: var(--surface); color: var(--accent); }
 .atmosphere { position: fixed; inset: 0; overflow: hidden; pointer-events: none; background: var(--surface); }
 .photograph { width: 100%; height: 100%; object-fit: cover; object-position: 50% 42%; opacity: .03; filter: saturate(.45); transform: scale(1.04); }
 .wash { position: absolute; inset: 0; background: linear-gradient(180deg, transparent, var(--surface)); opacity: .5; }
-.halo { position: absolute; width: 65vw; height: 65vw; border-radius: 50%; background: radial-gradient(ellipse, var(--glow), transparent 65%); }
-.halo-one { top: -38vw; left: -4vw; }
-.halo-two { bottom: -44vw; right: -8vw; opacity: .65; }
+.halo { position: absolute; width: 76vw; height: 76vw; border-radius: 50%; background: radial-gradient(ellipse, var(--glow), transparent 66%); }
+.halo-one { top: -38vw; left: -24vw; opacity: .8; }
+.halo-two { bottom: -40vw; right: -26vw; opacity: .7; }
+.halo-three { width: 54vw; height: 54vw; left: -32vw; bottom: -12vw; opacity: .5; }
+.light-ribbon { position: absolute; inset: -5%; width: 110%; height: 110%; overflow: visible; opacity: .55; color: var(--accent); mask-image: radial-gradient(ellipse at 50% 46%, rgba(0,0,0,.12) 10%, #000 70%); }
+.light-ribbon path { fill: none; stroke: currentColor; }
+.ribbon-bloom { stroke-width: 60; opacity: .09; filter: blur(22px); }
+.ribbon-core { stroke-width: 5; opacity: .15; filter: blur(5px); }
+.grain { position: absolute; inset: 0; background: url('/images/grain.svg') repeat; opacity: .025; mix-blend-mode: soft-light; }
+@media (prefers-reduced-motion: no-preference) {
+  .halo, .light-ribbon { will-change: transform, opacity; }
+}
 .vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, transparent 15%, rgba(0,0,0,.24) 100%); }
 .wave { position: absolute; width: 150vmax; height: 150vmax; left: 50%; top: 50%; margin: -75vmax; opacity: 0; transform: scale(.05); border-radius: 50%; background: radial-gradient(circle, rgba(178,242,216,.14) 0%, rgba(178,242,216,.08) 27%, transparent 62%); }
 .scene { min-height: 100svh; display: grid; place-items: center; padding: max(32px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(32px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left)); position: relative; }
@@ -47,7 +56,9 @@ noscript { max-width: 30em; text-align: center; line-height: 1.6; }
   .label { font-size: 11px; }
   .photograph { object-position: 52% 40%; }
   .halo { width: 150vw; height: 150vw; }
-  .halo-one { top: -55vw; left: -60vw; }
-  .halo-two { bottom: -70vw; right: -70vw; }
+  .halo-one { top: -55vw; left: -75vw; }
+  .halo-two { bottom: -65vw; right: -80vw; }
+  .halo-three { display: none; }
+  .light-ribbon { opacity: .38; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }

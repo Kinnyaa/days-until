@@ -10,9 +10,34 @@ const motion = matchMedia('(prefers-reduced-motion: reduce)');
 const active = new Map();
 let ended = false;
 let tickId;
-let breathing;
+const atmosphereAnimations = [];
+const compact = matchMedia('(max-width: 600px)');
 let pointerAnimation;
 let previous = {};
+
+function setupAtmosphere() {
+  for (const animation of atmosphereAnimations) animation.cancel();
+  atmosphereAnimations.length = 0;
+  for (const element of document.querySelectorAll('.halo, .light-ribbon')) {
+    element.style.removeProperty('transform');
+    element.style.removeProperty('opacity');
+  }
+  if (motion.matches) return;
+  const layers = [
+    ['.halo-one', 18000, '3vw', '2vh', [.8, .98, .8]],
+    ['.halo-two', 24000, '-3vw', '-3vh', [.7, .9, .7]],
+    ...(!compact.matches ? [['.halo-three', 28000, '2vw', '-2vh', [.5, .72, .5]]] : []),
+    ['.light-ribbon', 30000, '1.5vw', '-1.5vh', compact.matches ? [.38, .48, .38] : [.55, .7, .55]],
+  ];
+  for (const [selector, duration, x, y, opacity] of layers) {
+    const animation = animate(selector, {
+      x: ['0vw', x, '0vw'], y: ['0vh', y, '0vh'], opacity,
+      duration, loop: true, ease: 'inOutSine',
+    });
+    atmosphereAnimations.push(animation);
+    if (document.hidden) animation.pause();
+  }
+}
 
 function changeNumber(element, text) {
   active.get(element)?.cancel();
@@ -25,7 +50,6 @@ function finish(initial) {
   if (ended) return;
   ended = true;
   clearTimeout(tickId);
-  breathing?.cancel();
   document.querySelector('#announcement').textContent = 'Время до встречи — сегодня';
   const reveal = () => {
     countdown.hidden = true;
@@ -34,7 +58,7 @@ function finish(initial) {
     document.body.classList.add('finished');
     if (!initial && !motion.matches) animate(today, { opacity: [0, 1], y: [12, 0], duration: 1000, ease: 'outCubic' });
   };
-  const colors = { '--surface': '#5B2A5E', '--accent': '#B2F2D8', '--glow': 'rgba(178,242,216,.12)' };
+  const colors = { '--surface': '#5B2A5E', '--accent': '#B2F2D8', '--glow': 'rgba(178,242,216,.28)' };
   document.querySelector('meta[name="theme-color"]').content = '#5B2A5E';
   if (initial) {
     for (const [key, value] of Object.entries(colors)) root.style.setProperty(key, value);
@@ -70,12 +94,18 @@ if (!motion.matches) {
   animate('.composition', { opacity: [0, 1], y: [10, 0], duration: 900, ease: 'outCubic' });
   if (!ended) {
     animate('.unit', { opacity: [0, 1], y: [8, 0], delay: stagger(65, { start: 100 }), duration: 750, ease: 'outCubic' });
-    breathing = animate('.halo', { opacity: [.45, .85], duration: 5500, alternate: true, loop: true, ease: 'inOutSine' });
   }
 }
+setupAtmosphere();
+compact.addEventListener('change', setupAtmosphere);
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) { clearTimeout(tickId); breathing?.pause(); }
-  else if (!ended) { tick(); if (!motion.matches) breathing?.play(); }
+  if (document.hidden) {
+    clearTimeout(tickId);
+    for (const animation of atmosphereAnimations) animation.pause();
+  } else {
+    if (!ended) tick();
+    if (!motion.matches) for (const animation of atmosphereAnimations) animation.play();
+  }
 });
 window.addEventListener('pageshow', () => { if (!ended) tick(); });
 window.addEventListener('pointermove', (event) => {
@@ -84,10 +114,10 @@ window.addEventListener('pointermove', (event) => {
   pointerAnimation = animate('.photograph', { x: (event.clientX / innerWidth - .5) * 8, y: (event.clientY / innerHeight - .5) * 8, duration: 1200, ease: 'outCubic' });
 });
 motion.addEventListener('change', () => {
+  setupAtmosphere();
   if (motion.matches) {
-    breathing?.pause();
     pointerAnimation?.cancel();
     document.querySelector('.photograph').style.transform = 'scale(1.04)';
     for (const [element, animation] of active) { animation.cancel(); element.style.opacity = '1'; element.style.transform = ''; }
-  } else if (!ended && !document.hidden) breathing?.play();
+  }
 });
