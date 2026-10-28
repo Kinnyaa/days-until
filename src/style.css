@@ -15,7 +15,7 @@
 body { margin: 0; background: var(--surface); color: var(--accent); }
 [hidden] { display: none !important; }
 .atmosphere { position: fixed; inset: 0; overflow: hidden; pointer-events: none; background: var(--surface); }
-.photograph { width: 100%; height: 100%; object-fit: cover; object-position: 50% 42%; opacity: .03; filter: saturate(.45); transform: scale(1.04); }
+.photograph { width: 100%; height: 100%; object-fit: cover; object-position: 62% 34%; opacity: .03; filter: saturate(.45); transform: scale(1.04); }
 .wash { position: absolute; inset: 0; background: linear-gradient(180deg, transparent, var(--surface)); opacity: .5; }
 .halo { position: absolute; width: 76vw; height: 76vw; border-radius: 50%; background: radial-gradient(ellipse, var(--glow), transparent 66%); }
 .halo-one { top: -38vw; left: -24vw; opacity: .8; }
@@ -54,7 +54,7 @@ noscript { max-width: 30em; text-align: center; line-height: 1.6; }
   .unit:nth-child(5) { grid-column: 4 / span 2; }
   .number { font-size: clamp(45px, 12vw, 70px); }
   .label { font-size: 11px; }
-  .photograph { object-position: 52% 40%; }
+  .photograph { object-position: 62% 38%; }
   .halo { width: 150vw; height: 150vw; }
   .halo-one { top: -55vw; left: -75vw; }
   .halo-two { bottom: -65vw; right: -80vw; }
