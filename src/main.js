@@ -1,6 +1,7 @@
 import { animate, stagger } from 'animejs';
 import './style.css';
 import { remaining, plural, unitForms } from './timer.js';
+import { setupJourney } from './journey.js';
 
 const root = document.documentElement;
 const heading = document.querySelector('h1');
@@ -89,6 +90,7 @@ function tick(initial = false) {
 }
 
 tick(true);
+setupJourney();
 document.body.classList.add('ready');
 if (!motion.matches) {
   animate('.composition', { opacity: [0, 1], y: [10, 0], duration: 900, ease: 'outCubic' });

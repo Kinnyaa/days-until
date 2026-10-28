@@ -13,6 +13,41 @@
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--surface); color: var(--accent); }
+html, body { height: 100%; overflow: hidden; }
+.pages { height: 100svh; overflow-y: auto; overflow-x: hidden; scroll-snap-type: y mandatory; scroll-behavior: smooth; overscroll-behavior-y: contain; }
+.panel { height: 100svh; scroll-snap-align: start; scroll-snap-stop: always; position: relative; }
+.panel:not(.is-active) .journey-content, .ready .panel:not(.is-active) .composition, .panel:not(.is-active) .scroll-cue { visibility: hidden; }
+.scroll-cue { position: absolute; bottom: max(24px, env(safe-area-inset-bottom)); left: calc(50% - 20px); width: 40px; height: 40px; display: grid; place-items: center; color: var(--accent); opacity: .6; border-radius: 50%; }
+.scroll-cue:hover { opacity: 1; }
+.scroll-cue:focus-visible, .board-viewport:focus-visible { outline: 1px solid var(--accent); outline-offset: 4px; }
+.journey { display: grid; align-items: center; padding: max(28px, env(safe-area-inset-top)) 0 max(28px, env(safe-area-inset-bottom)); }
+.journey-content { width: 100%; min-width: 0; }
+.journey h2 { text-align: center; font-size: clamp(24px, 2.7vw, 38px); font-weight: 300; letter-spacing: -.025em; margin: 0 0 24px; }
+.board-viewport { width: 100%; overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--accent) 25%, transparent) transparent; overscroll-behavior-x: contain; }
+.board { position: relative; width: max(1220px, 100%); height: clamp(350px, 60svh, 520px); }
+.road { width: 100%; height: 100%; position: absolute; inset: 0; overflow: visible; fill: none; stroke: var(--accent); stroke-linecap: round; stroke-linejoin: round; }
+.road-bed { stroke-width: 30; opacity: .045; }
+.road-steps { stroke-width: 5; stroke-dasharray: 1 15; opacity: .27; }
+.road-progress { stroke-width: 2; opacity: .65; }
+.stops { list-style: none; margin: 0; padding: 0; }
+.stop { position: absolute; width: 0; height: 0; }
+.island { width: 40px; height: 34px; position: absolute; left: -20px; top: -17px; display: grid; place-items: center; border-radius: 43% 57% 49% 51% / 54% 44% 56% 46%; background: var(--surface); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); box-shadow: 0 4px 0 color-mix(in srgb, var(--accent) 6%, transparent), inset 0 0 0 5px color-mix(in srgb, var(--accent) 4%, transparent); }
+.island-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); opacity: .4; }
+.passed .island { border-color: color-mix(in srgb, var(--accent) 65%, transparent); box-shadow: 0 4px 0 color-mix(in srgb, var(--accent) 10%, transparent), inset 0 0 0 5px color-mix(in srgb, var(--accent) 10%, transparent); }
+.passed .island-dot, .on-date .island-dot { opacity: 1; }
+.on-date .island, .finish-stop .island { border-color: var(--accent); }
+.finish-stop .island { width: 48px; height: 42px; left: -24px; top: -21px; }
+.stop-caption { position: absolute; left: -49px; width: 98px; text-align: center; display: flex; flex-direction: column; gap: 7px; line-height: 1.5; }
+.label-above .stop-caption { bottom: 31px; }
+.label-below .stop-caption { top: 31px; }
+.stop time { font-size: 13px; font-weight: 500; white-space: nowrap; }
+.days-relative { font-size: 10px; white-space: nowrap; opacity: .8; font-variant-numeric: tabular-nums; }
+.finish-label { font-size: 10px; letter-spacing: .04em; }
+.traveler { position: absolute; width: 14px; height: 14px; margin: -7px; border: 1px solid var(--accent); border-radius: 50%; background: var(--surface); box-shadow: 0 0 18px var(--glow); display: grid; place-items: center; }
+.traveler span { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.journey-hint { display: none; text-align: center; font-size: 11px; opacity: .65; margin: 20px 0 0; }
+@media (max-width: 1219px) { .journey-hint { display: block; } }
+@media (max-height: 550px) { .journey h2 { margin-bottom: 0; font-size: 22px; } .board { height: 300px; } .journey-hint { margin-top: 0; } }
 [hidden] { display: none !important; }
 .atmosphere { position: fixed; inset: 0; overflow: hidden; pointer-events: none; background: var(--surface); }
 .photograph { width: 100%; height: 100%; object-fit: cover; object-position: 62% 34%; opacity: .03; filter: saturate(.45); transform: scale(1.04); }

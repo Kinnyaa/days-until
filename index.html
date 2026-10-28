@@ -23,7 +23,8 @@
       <div class="vignette"></div>
       <div class="wave"></div>
     </div>
-    <main class="scene" aria-labelledby="heading">
+    <main class="pages">
+    <section class="scene panel is-active" aria-labelledby="heading">
       <div class="composition">
         <h1 id="heading">Время до встречи</h1>
         <div class="time-surface">
@@ -39,6 +40,25 @@
       </div>
       <p class="sr-only" id="announcement" role="status" aria-live="polite"></p>
       <noscript>Для обратного отсчёта включите JavaScript. Встреча — 14 ноября 2026, 00:00 по Москве.</noscript>
+      <a class="scroll-cue" href="#journey" aria-label="Посмотреть наш путь"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    </section>
+    <section class="journey panel" id="journey" aria-labelledby="journey-heading">
+      <div class="journey-content">
+        <h2 id="journey-heading">Наш путь</h2>
+        <div class="board-viewport" tabindex="0" aria-label="Дорожка дат. Начало справа; прокручивайте влево, чтобы увидеть следующие месяцы.">
+          <div class="board">
+            <svg class="road" viewBox="0 0 1440 520" preserveAspectRatio="none" aria-hidden="true">
+              <path class="road-bed" />
+              <path class="road-steps" />
+              <path class="road-progress" />
+            </svg>
+            <ol class="stops" aria-label="Месяцы до встречи"></ol>
+            <div class="traveler" aria-hidden="true"><span></span></div>
+          </div>
+        </div>
+        <p class="journey-hint">Листай дорожку влево</p>
+      </div>
+    </section>
     </main>
     <script type="module" src="/src/main.js"></script>
   </body>
