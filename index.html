@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#2F3640" />
+    <meta name="description" content="С каждым мгновением ближе. До встречи 14 ноября 2026 года." />
+    <title>До встречи</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  </head>
+  <body>
+    <div class="atmosphere" aria-hidden="true">
+      <img class="photograph" src="./images/arrival-restored.png" alt="" />
+      <div class="wash"></div>
+      <div class="halo halo-one"></div>
+      <div class="halo halo-two"></div>
+      <div class="vignette"></div>
+      <div class="wave"></div>
+    </div>
+    <main class="scene" aria-labelledby="heading">
+      <div class="composition">
+        <h1 id="heading">Дней до приезда</h1>
+        <div class="time-surface">
+          <div class="countdown" role="timer" aria-label="Время до приезда" aria-live="off">
+            <div class="unit" data-unit="weeks"><span class="number">00</span><span class="label">недель</span></div>
+            <div class="unit" data-unit="days"><span class="number">00</span><span class="label">дней</span></div>
+            <div class="unit" data-unit="hours"><span class="number">00</span><span class="label">часов</span></div>
+            <div class="unit" data-unit="minutes"><span class="number">00</span><span class="label">минут</span></div>
+            <div class="unit" data-unit="seconds"><span class="number">00</span><span class="label">секунд</span></div>
+          </div>
+          <p class="today" hidden>Сегодня</p>
+        </div>
+      </div>
+      <p class="sr-only" id="announcement" role="status" aria-live="polite"></p>
+      <noscript>Для обратного отсчёта включите JavaScript. Встреча — 14 ноября 2026, 00:00 по Москве.</noscript>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
