@@ -26,8 +26,8 @@ test('crossing midnight transitions once into final colors and text', async ({ p
   await expect(page.locator('.today')).toBeVisible();
   await expect(page.locator('h1')).toHaveText('Время до встречи');
   await expect(page.locator('.countdown')).toBeHidden();
-  await expect(page.locator('body')).toHaveCSS('color', 'rgb(178, 242, 216)');
-  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(91, 42, 94)');
+  await expect(page.locator('body')).toHaveCSS('color', 'rgb(32, 60, 37)');
+  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(233, 246, 233)');
 });
 test('late visit and reduced motion immediately show the final state', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
@@ -35,7 +35,7 @@ test('late visit and reduced motion immediately show the final state', async ({ 
   await page.clock.pauseAt(deadline + 86400000);
   await page.goto('/');
   await expect(page.locator('.today')).toBeVisible();
-  await expect(page.locator('body')).toHaveCSS('color', 'rgb(178, 242, 216)');
+  await expect(page.locator('body')).toHaveCSS('color', 'rgb(32, 60, 37)');
   await expect(page.locator('.wave')).toHaveCSS('opacity', '0');
 });
 test('resuming a suspended tab catches up from the actual clock', async ({ page }) => {

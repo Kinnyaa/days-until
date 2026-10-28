@@ -7,6 +7,7 @@
   --surface: #2f3640;
   --accent: #b9a0f0;
   --glow: rgba(185, 160, 240, .28);
+  --edge-shade: rgba(0, 0, 0, .24);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -72,8 +73,8 @@ html, body { height: 100%; overflow: hidden; }
 @media (prefers-reduced-motion: no-preference) {
   .halo, .light-ribbon { will-change: transform, opacity; }
 }
-.vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, transparent 15%, rgba(0,0,0,.24) 100%); }
-.wave { position: absolute; width: 150vmax; height: 150vmax; left: 50%; top: 50%; margin: -75vmax; opacity: 0; transform: scale(.05); border-radius: 50%; background: radial-gradient(circle, rgba(178,242,216,.14) 0%, rgba(178,242,216,.08) 27%, transparent 62%); }
+.vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, transparent 15%, var(--edge-shade) 100%); }
+.wave { position: absolute; width: 150vmax; height: 150vmax; left: 50%; top: 50%; margin: -75vmax; opacity: 0; transform: scale(.05); border-radius: 50%; background: radial-gradient(circle, rgba(101,186,116,.14) 0%, rgba(101,186,116,.08) 27%, transparent 62%); }
 .scene { min-height: 100svh; display: grid; place-items: center; padding: max(32px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(32px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left)); position: relative; }
 .composition { width: min(1100px, 100%); text-align: center; padding-bottom: 3vh; visibility: hidden; }
 .ready .composition { visibility: visible; }
@@ -95,6 +96,7 @@ h1 { font-family: 'Manrope Variable', sans-serif; font-size: clamp(20px, 2vw, 28
 .label { transform: translateZ(14px); }
 .today { transform: translateZ(40px); text-shadow: 0 2px 0 color-mix(in srgb, var(--accent) 40%, var(--surface)), 0 4px 0 color-mix(in srgb, var(--accent) 20%, var(--surface)), 0 18px 30px rgba(0,0,0,.2); }
 .finished .time-surface::before { display: none; }
+.finished .today { text-shadow: 0 1px 0 rgba(255,255,255,.6), 0 12px 32px rgba(32,60,37,.08); }
 @media (max-width: 600px) { .time-surface { transform: rotateX(4deg); } .number { text-shadow: 0 1px 0 color-mix(in srgb, var(--accent) 55%, var(--surface)), 0 2px 0 color-mix(in srgb, var(--accent) 30%, var(--surface)), 0 3px 0 color-mix(in srgb, var(--accent) 15%, var(--surface)), 0 8px 12px rgba(0,0,0,.2); } }
 @media (prefers-reduced-motion: reduce) { .time-surface, .number, .label, .today { transform: none !important; } }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }

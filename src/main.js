@@ -63,8 +63,8 @@ function finish(initial) {
     document.body.classList.add('finished');
     if (!initial && !motion.matches) animate(today, { opacity: [0, 1], rotateX: [-30, 0], z: [80, 40], y: [12, 0], duration: 1200, ease: 'outCubic' });
   };
-  const colors = { '--surface': '#5B2A5E', '--accent': '#B2F2D8', '--glow': 'rgba(178,242,216,.28)' };
-  document.querySelector('meta[name="theme-color"]').content = '#5B2A5E';
+  const colors = { '--surface': '#E9F6E9', '--accent': '#203C25', '--glow': 'rgba(101,186,116,.28)', '--edge-shade': 'rgba(32,60,37,.06)' };
+  document.querySelector('meta[name="theme-color"]').content = '#E9F6E9';
   if (initial) {
     for (const [key, value] of Object.entries(colors)) root.style.setProperty(key, value);
     reveal();
